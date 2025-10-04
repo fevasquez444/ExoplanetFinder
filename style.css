@@ -1,0 +1,195 @@
+/* ==== GENERAL ==== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  background: #000;
+  overflow-x: hidden;
+}
+
+/* ==== HEADER ==== */
+header {
+  text-align: center;
+  padding: 30px 20px;
+  z-index: 2;
+  position: relative;
+}
+
+header h1 {
+  font-size: 2.5em;
+  color: #4afcff;
+  text-shadow: 0 0 15px #00f7ff, 0 0 25px #0ff;
+}
+
+header p {
+  font-size: 1.2em;
+  color: #ccc;
+}
+
+/* ==== MAIN CONTAINER ==== */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 50px;
+  margin: 50px auto;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  padding: 20px;
+  z-index: 2;
+  position: relative;
+}
+
+/* ==== COLUMNA IZQUIERDA (PLANETA) ==== */
+#planet-container {
+  width: 350px;
+  height: 350px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  margin: auto;
+  box-shadow: 0 0 40px rgba(74, 252, 255, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==== BOTÓN DE DETECTAR ==== */
+#detect-btn {
+  display: block;
+  margin: 25px auto;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.2em;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ff4aff, #4afcff);
+  box-shadow: 0 0 15px #4afcff, 0 0 30px #ff4aff;
+  transition: transform 0.2s ease-in-out;
+}
+
+#detect-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ==== COLUMNA DERECHA (DATOS) ==== */
+#data-container {
+  max-width: 400px;
+  padding: 20px;
+  background: rgba(0,0,0,0.7);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(74, 252, 255, 0.7);
+  text-align: center;
+  font-size: 1.1em;
+}
+
+/* ==== ESTADOS DE PREDICCIÓN ==== */
+.pred-confirmed {
+  color: #4aff72;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00ff88;
+}
+
+.pred-candidate {
+  color: #ffe14a;
+  font-weight: bold;
+  text-shadow: 0 0 10px #ffcc00;
+}
+
+.pred-false {
+  color: #ff4a4a;
+  font-weight: bold;
+  text-shadow: 0 0 10px #ff0000;
+}
+
+.pred-unknown {
+  color: #ccc;
+  font-style: italic;
+  text-shadow: 0 0 5px #999;
+}
+
+/* ==== FOOTER ==== */
+footer {
+  margin-top: 80px;
+  padding: 20px;
+  background: linear-gradient(90deg, #1a0033, #000000);
+  font-size: 0.9em;
+  color: #ccc;
+  text-shadow: 0 0 5px #4afcff;
+  border-top: 2px solid #4afcff;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+/* ==== FONDO DE ESTRELLAS PARALLAX ==== */
+.stars, .stars2, .stars3 {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+  animation: moveStars 100s linear infinite;
+  z-index: 0;
+}
+
+.stars2 {
+  background-size: 200px 200px;
+  animation-duration: 200s;
+  opacity: 0.5;
+}
+
+.stars3 {
+  background-size: 400px 400px;
+  animation-duration: 300s;
+  opacity: 0.3;
+}
+
+@keyframes moveStars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2000px); }
+}
+
+/* ==== CONTENEDOR DE GRÁFICAS ==== */
+#charts-container {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(74, 252, 255, 0.7);
+  text-align: center;
+  flex: 1 1 100%;
+}
+
+#charts-container h2 {
+  margin-bottom: 20px;
+  color: #4afcff;
+  text-shadow: 0 0 10px #00f7ff;
+}
+
+/* ==== FILA DE GRÁFICAS ==== */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.charts-row img {
+  width: 100%;
+  height: 300px; /* mismo alto para ambas gráficas */
+  object-fit: contain;
+  border: 2px solid #4afcff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(74, 252, 255, 0.7);
+}
+
+/* ==== RESPONSIVE (móviles: apiladas) ==== */
+@media (max-width: 768px) {
+  .charts-row {
+    grid-template-columns: 1fr; /* se apilan */
+  }
+  .charts-row img {
+    height: auto;
+  }
+}

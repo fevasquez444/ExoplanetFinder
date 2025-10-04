@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌌 Exoplanet Finder</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Fondos animados -->
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+  <div class="nebulosa"></div>
+
+  <!-- Encabezado -->
+  <header>
+    <h1>🌌 Exoplanet Finder</h1>
+    <p>Discover invisible worlds with AI</p>
+  </header>
+
+  <!-- Contenido principal -->
+  <main>
+    <!-- Contenedor visual del planeta -->
+    <div id="planet-container"></div>
+    <button id="detect-btn">🔭 Detect Exoplanet</button>
+
+    <!-- Contenedor de datos del planeta -->
+    <div id="data-container">
+      <h2>Waiting for detection...</h2>
+      <p>Press the button to generate a new planet.</p>
+      
+      <!-- 📌 Aquí se insertarán dinámicamente los resultados -->
+      <div id="prediction-result"></div>
+    </div>
+
+    <!-- 🔥 Contenedor de gráficas -->
+    <div id="charts-container">
+      <h2>📊 Data Visualization</h2>
+      <div class="charts-row">
+        <img id="histograma" alt="Histogram" style="display:none;">
+        <img id="dispersion" alt="Scatter Plot" style="display:none;">
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Exoplanet Finder Web App | Created by Ammy Vasquez Santamaria</p>
+    <p>Astronomy Group "The Stars of Calasanz" Ammy, Victoria, Maria, Ana, Angie</p>
+    <p>Based on data from the NASA Exoplanet Archive and the Space Apps Challenge</p>
+  </footer>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+</body>
+</html>
