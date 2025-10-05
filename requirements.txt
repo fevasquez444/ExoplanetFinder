@@ -1,8 +1,8 @@
-flask
+Flask
+gunicorn
 flask-cors
 pandas
+matplotlib
 numpy
 scikit-learn
-matplotlib
-gunicorn
 requests
