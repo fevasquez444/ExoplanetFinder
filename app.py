@@ -5,48 +5,69 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import pandas as pd
 import matplotlib
-matplotlib.use("Agg")
+matplotlib.use("Agg")  # ✅ Evita errores de entorno gráfico
 import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 
+# === CONFIGURACIÓN FLASK ===
 app = Flask(__name__, static_url_path='', static_folder='.', template_folder='.')
 CORS(app)
 
-# ==== CARGA DIRECTA DEL DATASET NASA ====
+
+# === CARGA DE DATASET (NASA LIVE + RESPALDO LOCAL) ===
 def cargar_dataset():
-    url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+top+2000+pl_name,disc_year,discoverymethod,pl_rade,pl_bmasse,default_flag,disposition+from+ps&format=csv"
-    print("🌍 Descargando dataset NASA en vivo...")
-    df = pd.read_csv(url, comment='#', low_memory=False)
-    print(f"✅ Dataset cargado con {len(df)} registros reales.")
+    nasa_url = (
+        "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?"
+        "query=select+top+2000+pl_name,disc_year,discoverymethod,"
+        "pl_rade,pl_bmasse,default_flag,disposition+from+ps&format=csv"
+    )
+    try:
+        print("🌍 Descargando dataset NASA en vivo...")
+        df = pd.read_csv(nasa_url, comment="#", low_memory=False)
+        print(f"✅ Dataset NASA cargado correctamente ({len(df)} registros).")
+    except Exception as e:
+        print(f"⚠️ Error al descargar dataset NASA: {e}")
+        if os.path.exists("exoplanets_ps.csv"):
+            print("📂 Cargando dataset de respaldo local...")
+            df = pd.read_csv("exoplanets_ps.csv")
+        else:
+            raise RuntimeError("❌ No se pudo cargar ni el dataset NASA ni el respaldo local.")
     return df
 
-# ==== ENTRENAR MODELO UNA VEZ AL INICIAR ====
+
+# === ENTRENAMIENTO DEL MODELO ===
 def train_model():
     df = cargar_dataset()
 
-    cols_interes = ["pl_name", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "default_flag", "disposition"]
-    for col in cols_interes:
+    # Seleccionar columnas clave
+    cols = ["pl_name", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "default_flag", "disposition"]
+    for col in cols:
         if col not in df.columns:
             df[col] = None
 
-    numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
-    numeric_cols = numeric_cols[:2]
-    df = df.dropna(subset=numeric_cols)
+    # Columnas numéricas simples
+    num_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+    num_cols = num_cols[:2] if len(num_cols) >= 2 else ["pl_rade", "pl_bmasse"]
 
+    df = df.dropna(subset=num_cols)
+
+    # Etiquetas: disposición NASA
     y = df["disposition"].fillna("UNKNOWN").astype(str)
-    X = df[numeric_cols]
+    X = df[num_cols]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
     model = DecisionTreeClassifier(max_depth=5)
     model.fit(X_train, y_train)
 
-    print("✅ Modelo entrenado, precisión:", accuracy_score(y_test, model.predict(X_test)))
-    return model, numeric_cols, df
+    print(f"✅ Modelo entrenado. Precisión: {accuracy_score(y_test, model.predict(X_test)):.2f}")
 
-# ==== VISUALIZACIONES ====
+    return model, num_cols, df
+
+
+# === VISUALIZACIONES ===
 def grafico_histograma(df, cols, planeta):
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.hist(df[cols[0]], bins=30, color="skyblue", edgecolor="black", alpha=0.7)
@@ -61,6 +82,7 @@ def grafico_histograma(df, cols, planeta):
     img.seek(0)
     plt.close(fig)
     return base64.b64encode(img.getvalue()).decode("utf-8")
+
 
 def grafico_dispersion(df, cols, planeta):
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -77,22 +99,27 @@ def grafico_dispersion(df, cols, planeta):
     plt.close(fig)
     return base64.b64encode(img.getvalue()).decode("utf-8")
 
-# ==== ENTRENAMIENTO GLOBAL ====
+
+# === ENTRENAR MODELO GLOBAL ===
 model, features, dataset = train_model()
 
-# ==== RUTA PRINCIPAL ====
+
+# === RUTAS ===
 @app.route('/')
 def home():
     return app.send_static_file('index.html')
 
-# ==== API ====
+
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
         data = request.get_json()
-        values = [[data.get('val1', 0), data.get('val2', 0)]]
+        val1 = data.get("val1", 0)
+        val2 = data.get("val2", 0)
+        values = [[val1, val2]]
         pred = model.predict(values)[0]
 
+        # Planeta aleatorio
         random_planet = dataset.sample(1).iloc[0]
 
         histograma_b64 = grafico_histograma(dataset, features, random_planet)
@@ -113,9 +140,10 @@ def predict():
             "dispersion": dispersion_b64
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
 
-# ==== EJECUCIÓN PARA RENDER ====
+
+# === MAIN ===
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
