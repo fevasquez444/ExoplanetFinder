@@ -13,7 +13,6 @@ document.getElementById("detect-btn").addEventListener("click", async () => {
   try {
     // 📡 Llamar al backend Flask (predicción IA + gráficos dinámicos)
     const response = await fetch("/predict", {
-
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -39,7 +38,7 @@ document.getElementById("detect-btn").addEventListener("click", async () => {
     planetContainer.appendChild(planet);
 
     // 🛰️ Texto + emoji + clase CSS de la predicción IA
-    let predText = result.pred_label?.toUpperCase() ?? "UNKNOWN";
+    let predText = (result.pred_label || result.disposition || "UNKNOWN").toUpperCase();
     let predClass = "pred-unknown";
     let predEmoji = "🔍";
 
@@ -48,7 +47,7 @@ document.getElementById("detect-btn").addEventListener("click", async () => {
       predEmoji = "✅";
     } else if (predText.includes("CANDIDATE")) {
       predClass = "pred-candidate";
-      predEmoji = "❓";
+      predEmoji = "🟡";
     } else if (predText.includes("FALSE")) {
       predClass = "pred-false";
       predEmoji = "❌";
@@ -84,7 +83,7 @@ document.getElementById("detect-btn").addEventListener("click", async () => {
     console.error("Error:", error);
     dataContainer.innerHTML = `
       <h2>⚠️ Error al conectar con la IA</h2>
-      <p>¿Está corriendo el servidor Flask en <code>http://127.0.0.1:5000</code>?</p>
+      <p>Verifica que el servidor Flask o Render esté activo.</p>
     `;
   }
 });
